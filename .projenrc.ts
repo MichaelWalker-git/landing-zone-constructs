@@ -1,17 +1,58 @@
 import { awscdk } from 'projen';
+
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'michaelwalker',
-  authorAddress: 'michaelhuytran@gmail.com',
-  cdkVersion: '2.1.0',
+  authorAddress: 'michaelhuywalker@gmail.com',
+  cdkVersion: '2.89.0',
   defaultReleaseBranch: 'main',
   jsiiVersion: '~5.0.0',
   name: 'landing-zone-constructs',
   projenrcTs: true,
-  repositoryUrl: 'https://github.com/michaelhuytran/landing-zone-constructs.git',
-
-  // deps: [],                /* Runtime dependencies of this module. */
-  // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
+  repositoryUrl: 'https://github.com/MichaelWalker-git/landing-zone-constructs.git',
+  deps: [
+    '@aws-sdk/client-config-service',
+    '@aws-sdk/client-codecommit',
+    '@aws-sdk/client-codepipeline',
+    '@aws-sdk/client-ssm',
+    '@aws-sdk/client-kms',
+    '@aws-sdk/client-sts',
+    '@aws-sdk/client-cloudwatch-logs',
+    '@aws-sdk/client-service-catalog',
+    '@aws-sdk/client-iam',
+    '@aws-sdk/client-dynamodb',
+    '@aws-sdk/lib-dynamodb',
+    'aws-sdk',
+    'adm-zip',
+    '@aws-sdk/client-controltower',
+    'winston',
+    '@aws-sdk/client-organizations',
+    '@aws-sdk/client-codecommit',
+    'pascal-case',
+    'js-yaml',
+    '@aws-sdk/util-retry',
+    'exponential-backoff',
+    '@aws-sdk/client-s3',
+    '@types/uuid',
+    'cdk-nag',
+    'path',
+    'uuid',
+  ],
+  devDeps: [
+    'eslint-config-prettier',
+    '@types/jest',
+    '@types/node',
+    'eslint-config-standard',
+    'eslint-import-resolver-node',
+    'eslint-import-resolver-typescript',
+    'eslint-plugin-import',
+    'eslint-plugin-license-header',
+    'eslint-plugin-node',
+    'eslint-plugin-prettier',
+    'jest-sonar-reporter',
+    '@aws-sdk/client-config-service',
+    '@types/uuid',
+  ],
+  description: 'This is a construct library for all of the aws-accelerator L2 constructs',
   // packageName: undefined,  /* The "name" in package.json. */
 });
 project.synth();
