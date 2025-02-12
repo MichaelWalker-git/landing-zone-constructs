@@ -15,8 +15,8 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { IpamAllocationConfig } from '../network-config';
 
-import { IpamAllocationConfig } from '@aws-accelerator/config';
 
 export interface IIpamSubnet extends cdk.IResource {
   /**

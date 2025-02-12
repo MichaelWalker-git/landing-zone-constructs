@@ -12,10 +12,10 @@
  */
 
 import * as cdk from 'aws-cdk-lib';
-import { AutoScalingConfig } from '@aws-accelerator/config';
 import { Construct } from 'constructs';
 import { AutoscalingGroup } from '../aws-autoscaling/create-autoscaling-group';
 import { Firewall, FirewallProps, IFirewall } from './firewall';
+import { AutoScalingConfig } from '../customizations-config';
 
 export interface IFirewallAutoScalingGroup extends IFirewall {
   /**

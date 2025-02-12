@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { pascalCase } from 'pascal-case';
+import { toPascalCase } from '../common/functions';
 
 /**
  * Interface representing the properties required to enable a Control Tower control.
@@ -82,7 +82,7 @@ export class CreateControlTowerEnabledControls extends Construct {
       return new cdk.aws_controltower.CfnEnabledControl(
         // Scope is set to the parent stack to maintain logical IDs of already deployed resources. Do not change this value!
         cdk.Stack.of(this),
-        pascalCase(`${control.enabledControlIdentifier}-${control.ouName}`),
+        toPascalCase(`${control.enabledControlIdentifier}-${control.ouName}`),
         {
           controlIdentifier: enabledControlArn,
           targetIdentifier: control.ouArn,

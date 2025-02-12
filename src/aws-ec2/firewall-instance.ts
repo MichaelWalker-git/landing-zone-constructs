@@ -14,7 +14,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Firewall, FirewallProps, IFirewall } from './firewall';
-import { NetworkInterfaceItemConfig } from '@aws-accelerator/config';
+import { NetworkInterfaceItemConfig } from '../customizations-config';
 
 export interface IFirewallInstance extends IFirewall {
   /**

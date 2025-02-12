@@ -27,7 +27,6 @@ const project = new awscdk.AwsCdkConstructLibrary({
     'winston',
     '@aws-sdk/client-organizations',
     '@aws-sdk/client-codecommit',
-    'pascal-case',
     'js-yaml',
     '@aws-sdk/util-retry',
     'exponential-backoff',
@@ -36,6 +35,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
     'cdk-nag',
     'path',
     'uuid',
+    'ajv',
   ],
   devDeps: [
     'eslint-config-prettier',

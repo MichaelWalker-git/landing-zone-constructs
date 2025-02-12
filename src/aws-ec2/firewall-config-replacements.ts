@@ -12,7 +12,7 @@
  */
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import path from 'path';
+import * as path from 'path';
 import { LzaCustomResource } from '../lza-custom-resource';
 
 interface FirewallConfigReplacementProps {

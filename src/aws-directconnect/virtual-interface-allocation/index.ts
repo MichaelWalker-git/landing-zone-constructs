@@ -13,12 +13,9 @@
 
 import * as AWS from 'aws-sdk';
 
-import { throttlingBackOff } from ;
-import {
-  CloudFormationCustomResourceEvent,
-  CloudFormationCustomResourceUpdateEvent,
-} from '@aws-accelerator/utils/lib/common-types';
 import { VirtualInterfaceAllocationAttributes } from './attributes';
+import { CloudFormationCustomResourceEvent, CloudFormationCustomResourceUpdateEvent } from '../../utils/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
 
 /**
  * direct-connect-virtual-interface - lambda handler
@@ -28,17 +25,17 @@ import { VirtualInterfaceAllocationAttributes } from './attributes';
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      PhysicalResourceId: string;
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Status: string;
+  }
   | undefined
 > {
   // Set variables
   const vif = vifInit(event);
   const apiProps = setApiProps(vif);
   const dx = new AWS.DirectConnect({
-    region: event.ResourceProperties['region'],
-    customUserAgent: process.env['SOLUTION_ID'],
+    region: event.ResourceProperties.region,
+    customUserAgent: process.env.SOLUTION_ID,
   });
 
   // Event handler
@@ -63,7 +60,7 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
       }
 
       if (!virtualInterfaceId) {
-        throw new Error(`Unable to create virtual interface allocation.`);
+        throw new Error('Unable to create virtual interface allocation.');
       }
 
       return {
@@ -123,18 +120,18 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
  */
 function vifInit(event: CloudFormationCustomResourceEvent): VirtualInterfaceAllocationAttributes {
   // Set variables from event
-  const addressFamily: string = event.ResourceProperties['addressFamily'];
-  const amazonAddress: string | undefined = event.ResourceProperties['amazonAddress'];
-  const asn: number = event.ResourceProperties['customerAsn'];
-  const connectionId: string = event.ResourceProperties['connectionId'];
-  const customerAddress: string | undefined = event.ResourceProperties['customerAddress'];
-  const jumboFrames: boolean | undefined = returnBoolean(event.ResourceProperties['jumboFrames']);
-  const ownerAccount: string = event.ResourceProperties['ownerAccount'];
-  const siteLink: boolean | undefined = returnBoolean(event.ResourceProperties['enableSiteLink']);
-  const virtualInterfaceName: string = event.ResourceProperties['interfaceName'];
-  const virtualInterfaceType: 'private' | 'transit' = event.ResourceProperties['type'];
-  const vlan: number = event.ResourceProperties['vlan'];
-  const tags: AWS.DirectConnect.TagList = event.ResourceProperties['tags'] ?? [];
+  const addressFamily: string = event.ResourceProperties.addressFamily;
+  const amazonAddress: string | undefined = event.ResourceProperties.amazonAddress;
+  const asn: number = event.ResourceProperties.customerAsn;
+  const connectionId: string = event.ResourceProperties.connectionId;
+  const customerAddress: string | undefined = event.ResourceProperties.customerAddress;
+  const jumboFrames: boolean | undefined = returnBoolean(event.ResourceProperties.jumboFrames);
+  const ownerAccount: string = event.ResourceProperties.ownerAccount;
+  const siteLink: boolean | undefined = returnBoolean(event.ResourceProperties.enableSiteLink);
+  const virtualInterfaceName: string = event.ResourceProperties.interfaceName;
+  const virtualInterfaceType: 'private' | 'transit' = event.ResourceProperties.type;
+  const vlan: number = event.ResourceProperties.vlan;
+  const tags: AWS.DirectConnect.TagList = event.ResourceProperties.tags ?? [];
 
   // Add Name tag
   tags.push({ key: 'Name', value: virtualInterfaceName });
@@ -213,18 +210,18 @@ function setApiProps(
  */
 function oldVifInit(event: CloudFormationCustomResourceUpdateEvent): VirtualInterfaceAllocationAttributes {
   // Set variables from event
-  const addressFamily: string = event.OldResourceProperties['addressFamily'];
-  const amazonAddress: string | undefined = event.OldResourceProperties['amazonAddress'];
-  const asn: number = event.OldResourceProperties['customerAsn'];
-  const connectionId: string = event.OldResourceProperties['connectionId'];
-  const customerAddress: string | undefined = event.OldResourceProperties['customerAddress'];
-  const jumboFrames: boolean | undefined = returnBoolean(event.OldResourceProperties['jumboFrames']);
-  const ownerAccount: string = event.OldResourceProperties['ownerAccount'];
-  const siteLink: boolean | undefined = returnBoolean(event.OldResourceProperties['enableSiteLink']);
-  const virtualInterfaceName: string = event.OldResourceProperties['interfaceName'];
-  const virtualInterfaceType: 'private' | 'transit' = event.OldResourceProperties['type'];
-  const vlan: number = event.OldResourceProperties['vlan'];
-  const tags: AWS.DirectConnect.TagList = event.OldResourceProperties['tags'] ?? [];
+  const addressFamily: string = event.OldResourceProperties.addressFamily;
+  const amazonAddress: string | undefined = event.OldResourceProperties.amazonAddress;
+  const asn: number = event.OldResourceProperties.customerAsn;
+  const connectionId: string = event.OldResourceProperties.connectionId;
+  const customerAddress: string | undefined = event.OldResourceProperties.customerAddress;
+  const jumboFrames: boolean | undefined = returnBoolean(event.OldResourceProperties.jumboFrames);
+  const ownerAccount: string = event.OldResourceProperties.ownerAccount;
+  const siteLink: boolean | undefined = returnBoolean(event.OldResourceProperties.enableSiteLink);
+  const virtualInterfaceName: string = event.OldResourceProperties.interfaceName;
+  const virtualInterfaceType: 'private' | 'transit' = event.OldResourceProperties.type;
+  const vlan: number = event.OldResourceProperties.vlan;
+  const tags: AWS.DirectConnect.TagList = event.OldResourceProperties.tags ?? [];
 
   // Add Name tag
   tags.push({ key: 'Name', value: virtualInterfaceName });

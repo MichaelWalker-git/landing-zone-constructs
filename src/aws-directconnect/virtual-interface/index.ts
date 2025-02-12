@@ -13,12 +13,9 @@
 
 import * as AWS from 'aws-sdk';
 
-import { throttlingBackOff } from ;
-import {
-  CloudFormationCustomResourceEvent,
-  CloudFormationCustomResourceUpdateEvent,
-} from '@aws-accelerator/utils/lib/common-types';
 import { VirtualInterfaceAttributes } from './attributes';
+import { throttlingBackOff } from '../../utils/throttle';
+import { CloudFormationCustomResourceEvent, CloudFormationCustomResourceUpdateEvent } from '../../utils/common-types';
 
 /**
  * direct-connect-virtual-interface - lambda handler
@@ -28,17 +25,17 @@ import { VirtualInterfaceAttributes } from './attributes';
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      PhysicalResourceId: string;
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Status: string;
+  }
   | undefined
 > {
   // Set variables
-  const solutionId = process.env['SOLUTION_ID'];
+  const solutionId = process.env.SOLUTION_ID;
   const vif = vifInit(event);
   const apiProps = setApiProps(vif);
   const dx = new AWS.DirectConnect({
-    region: event.ResourceProperties['region'],
+    region: event.ResourceProperties.region,
     customUserAgent: solutionId,
   });
   const lambdaClient = new AWS.Lambda({ customUserAgent: solutionId });
@@ -65,7 +62,7 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
       }
 
       if (!virtualInterfaceId) {
-        throw new Error(`Unable to create virtual interface.`);
+        throw new Error('Unable to create virtual interface.');
       }
 
       if (await validateState(dx, virtualInterfaceId, ['available', 'down'])) {
@@ -169,18 +166,18 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
  */
 function vifInit(event: CloudFormationCustomResourceEvent): VirtualInterfaceAttributes {
   // Set variables from event
-  const addressFamily: string = event.ResourceProperties['addressFamily'];
-  const amazonAddress: string | undefined = event.ResourceProperties['amazonAddress'];
-  const asn: number = event.ResourceProperties['customerAsn'];
-  const connectionId: string = event.ResourceProperties['connectionId'];
-  const customerAddress: string | undefined = event.ResourceProperties['customerAddress'];
-  const directConnectGatewayId: string = event.ResourceProperties['directConnectGatewayId'];
-  const jumboFrames: boolean | undefined = returnBoolean(event.ResourceProperties['jumboFrames']);
-  const siteLink: boolean | undefined = returnBoolean(event.ResourceProperties['enableSiteLink']);
-  const virtualInterfaceName: string = event.ResourceProperties['interfaceName'];
-  const virtualInterfaceType: 'private' | 'transit' = event.ResourceProperties['type'];
-  const vlan: number = event.ResourceProperties['vlan'];
-  const tags: AWS.DirectConnect.TagList = event.ResourceProperties['tags'] ?? [];
+  const addressFamily: string = event.ResourceProperties.addressFamily;
+  const amazonAddress: string | undefined = event.ResourceProperties.amazonAddress;
+  const asn: number = event.ResourceProperties.customerAsn;
+  const connectionId: string = event.ResourceProperties.connectionId;
+  const customerAddress: string | undefined = event.ResourceProperties.customerAddress;
+  const directConnectGatewayId: string = event.ResourceProperties.directConnectGatewayId;
+  const jumboFrames: boolean | undefined = returnBoolean(event.ResourceProperties.jumboFrames);
+  const siteLink: boolean | undefined = returnBoolean(event.ResourceProperties.enableSiteLink);
+  const virtualInterfaceName: string = event.ResourceProperties.interfaceName;
+  const virtualInterfaceType: 'private' | 'transit' = event.ResourceProperties.type;
+  const vlan: number = event.ResourceProperties.vlan;
+  const tags: AWS.DirectConnect.TagList = event.ResourceProperties.tags ?? [];
 
   // Add Name tag
   tags.push({ key: 'Name', value: virtualInterfaceName });
@@ -250,18 +247,18 @@ function setApiProps(
  */
 function oldVifInit(event: CloudFormationCustomResourceUpdateEvent) {
   // Set variables from event
-  const addressFamily: string = event.OldResourceProperties['addressFamily'];
-  const amazonAddress: string | undefined = event.OldResourceProperties['amazonAddress'];
-  const asn: number = event.OldResourceProperties['customerAsn'];
-  const connectionId: string = event.OldResourceProperties['connectionId'];
-  const customerAddress: string | undefined = event.OldResourceProperties['customerAddress'];
-  const directConnectGatewayId: string = event.OldResourceProperties['directConnectGatewayId'];
-  const jumboFrames: boolean | undefined = returnBoolean(event.OldResourceProperties['jumboFrames']);
-  const siteLink: boolean | undefined = returnBoolean(event.OldResourceProperties['enableSiteLink']);
-  const virtualInterfaceName: string = event.OldResourceProperties['interfaceName'];
-  const virtualInterfaceType: 'private' | 'transit' = event.OldResourceProperties['type'];
-  const vlan: number = event.OldResourceProperties['vlan'];
-  const tags: AWS.DirectConnect.TagList = event.OldResourceProperties['tags'] ?? [];
+  const addressFamily: string = event.OldResourceProperties.addressFamily;
+  const amazonAddress: string | undefined = event.OldResourceProperties.amazonAddress;
+  const asn: number = event.OldResourceProperties.customerAsn;
+  const connectionId: string = event.OldResourceProperties.connectionId;
+  const customerAddress: string | undefined = event.OldResourceProperties.customerAddress;
+  const directConnectGatewayId: string = event.OldResourceProperties.directConnectGatewayId;
+  const jumboFrames: boolean | undefined = returnBoolean(event.OldResourceProperties.jumboFrames);
+  const siteLink: boolean | undefined = returnBoolean(event.OldResourceProperties.enableSiteLink);
+  const virtualInterfaceName: string = event.OldResourceProperties.interfaceName;
+  const virtualInterfaceType: 'private' | 'transit' = event.OldResourceProperties.type;
+  const vlan: number = event.OldResourceProperties.vlan;
+  const tags: AWS.DirectConnect.TagList = event.OldResourceProperties.tags ?? [];
 
   // Add Name tag
   tags.push({ key: 'Name', value: virtualInterfaceName });
@@ -337,7 +334,7 @@ async function createTransitInterface(
 function generateVifArn(event: CloudFormationCustomResourceUpdateEvent): string {
   const accountId = event.ServiceToken.split(':')[4];
   const partition = event.ServiceToken.split(':')[1];
-  const region = event.ResourceProperties['region'];
+  const region = event.ResourceProperties.region;
   const vifId = event.PhysicalResourceId;
 
   return `arn:${partition}:directconnect:${region}:${accountId}:dxvif/${vifId}`;
@@ -451,15 +448,15 @@ async function inProgress(dx: AWS.DirectConnect, virtualInterfaceId: string): Pr
  */
 async function retryLambda(lambdaClient: AWS.Lambda, event: CloudFormationCustomResourceEvent): Promise<void> {
   // Add retry attempt to event
-  if (!event.ResourceProperties['retryAttempt']) {
-    event.ResourceProperties['retryAttempt'] = 0;
+  if (!event.ResourceProperties.retryAttempt) {
+    event.ResourceProperties.retryAttempt = 0;
   }
-  event.ResourceProperties['retryAttempt'] += 1;
+  event.ResourceProperties.retryAttempt += 1;
 
   // Throw error for max number of retries
-  if (event.ResourceProperties['retryAttempt'] > 3) {
+  if (event.ResourceProperties.retryAttempt > 3) {
     throw new Error(
-      `Exceeded maximum number of retries. Please check the Direct Connect console for the status of your virtual interface.`,
+      'Exceeded maximum number of retries. Please check the Direct Connect console for the status of your virtual interface.',
     );
   }
 

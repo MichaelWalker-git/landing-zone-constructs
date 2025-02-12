@@ -20,7 +20,7 @@ import { createLogger } from '@aws-accelerator/utils/lib/logger';
 
 const logger = createLogger(['constructs-organization-policy-attachment']);
 
-const path = require('path');
+import * as path from 'path'
 
 /**
  * Initialized Policy properties

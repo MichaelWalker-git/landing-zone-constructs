@@ -11,16 +11,11 @@
  *  and limitations under the License.
  */
 
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
-import * as path from 'path';
-
-import { createLogger } from '@aws-accelerator/utils/lib/logger';
 
 import * as t from './common';
 import * as i from './models/network-config';
 import * as CustomizationsConfig from './customizations-config';
-import { ReplacementsConfig } from './replacements-config';
+import { createLogger } from './utils/logger';
 
 const logger = createLogger(['network-config']);
 
@@ -921,33 +916,5 @@ export class NetworkConfig implements i.INetworkConfig {
 
     logger.error(`Transit gateway peering ${peeringName} not found !!!`);
     throw new Error('configuration validation failed.');
-  }
-
-  /**
-   *
-   * @param dir
-   * @returns
-   */
-  static load(dir: string, replacementsConfig?: ReplacementsConfig): NetworkConfig {
-    const initialBuffer = fs.readFileSync(path.join(dir, NetworkConfig.FILENAME), 'utf8');
-    const buffer = replacementsConfig ? replacementsConfig.preProcessBuffer(initialBuffer) : initialBuffer;
-    const values = t.parseNetworkConfig(yaml.load(buffer));
-
-    return new NetworkConfig(values);
-  }
-
-  /**
-   * Load from string content
-   * @param content
-   */
-  static loadFromString(content: string): NetworkConfig | undefined {
-    try {
-      const values = t.parseNetworkConfig(yaml.load(content));
-      return new NetworkConfig(values);
-    } catch (e) {
-      logger.error('Error parsing input, network config undefined');
-      logger.error(`${e}`);
-      throw new Error('could not load configuration.');
-    }
   }
 }

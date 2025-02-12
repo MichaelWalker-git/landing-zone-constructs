@@ -12,9 +12,9 @@
  */
 
 import * as AWS from 'aws-sdk';
+import { CloudFormationCustomResourceEvent } from '../../utils/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
 
-import { throttlingBackOff } from ;
-import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/common-types';
 
 /**
  * direct-connect-gateway-association-proposal - lambda handler
@@ -24,18 +24,18 @@ import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/co
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      PhysicalResourceId: string;
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Status: string;
+  }
   | undefined
 > {
   // Set variables
-  const allowedPrefixesInitial: string[] = event.ResourceProperties['allowedPrefixes'];
-  const directConnectGatewayId: string = event.ResourceProperties['directConnectGatewayId'];
-  const directConnectGatewayOwnerAccount: string = event.ResourceProperties['directConnectGatewayOwnerAccount'];
-  const solutionId = process.env['SOLUTION_ID'];
+  const allowedPrefixesInitial: string[] = event.ResourceProperties.allowedPrefixes;
+  const directConnectGatewayId: string = event.ResourceProperties.directConnectGatewayId;
+  const directConnectGatewayOwnerAccount: string = event.ResourceProperties.directConnectGatewayOwnerAccount;
+  const solutionId = process.env.SOLUTION_ID;
   const dx = new AWS.DirectConnect({ customUserAgent: solutionId });
-  const gatewayId: string = event.ResourceProperties['gatewayId'];
+  const gatewayId: string = event.ResourceProperties.gatewayId;
 
   switch (event.RequestType) {
     case 'Create':

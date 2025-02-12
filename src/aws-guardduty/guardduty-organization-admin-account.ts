@@ -15,7 +15,7 @@ import { PolicyStatementType } from '@aws-accelerator/utils/lib/common-resources
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-const path = require('path');
+import * as path from 'path'
 
 /**
  * Initialized GuardDutyOrganizationalAdminAccountProps properties

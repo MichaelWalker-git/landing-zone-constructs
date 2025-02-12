@@ -21,10 +21,10 @@ import {
   GetRoleCommand,
   NoSuchEntityException,
 } from '@aws-sdk/client-iam';
+import { setRetryStrategy } from '../../common/functions';
+import { IAssumeRoleCredential } from '../../common/resources';
 import { throttlingBackOff } from '../../common/throttle';
 import { createLogger } from '../../utils/logger';
-import { IAssumeRoleCredential } from '../../common/resources';
-import { setRetryStrategy } from '../../common/functions';
 
 
 /**
@@ -41,6 +41,41 @@ import { setRetryStrategy } from '../../common/functions';
  * Please review the [document](https://docs.aws.amazon.com/controltower/latest/userguide/lz-api-prereques.html) for more information.
  */
 export abstract class IamRole {
+  /**
+   * Function to create AWS Control Tower Landing Zone roles
+   * @param partition string
+   * @param region string
+   * @param solutionId string
+   * @param managementAccountCredentials {@link IAssumeRoleCredential} | undefined
+   */
+  public static async createControlTowerRoles(
+    partition: string,
+    region: string,
+    solutionId: string,
+    managementAccountCredentials?: IAssumeRoleCredential,
+  ): Promise<void> {
+    const client: IAMClient = new IAMClient({
+      region: region,
+      customUserAgent: solutionId,
+      retryStrategy: setRetryStrategy(),
+      credentials: managementAccountCredentials,
+    });
+
+    const existingRoles = await IamRole.controlTowerRolesExists(client);
+
+    if (existingRoles.status && existingRoles.message.length > 0) {
+      throw new Error(
+        `There are existing AWS Control Tower Landing Zone roles "${existingRoles.message.join(
+          ',',
+        )}", the solution cannot deploy AWS Control Tower Landing Zone`,
+      );
+    }
+
+    for (const roleName of IamRole.requiredControlTowerRoleNames) {
+      await IamRole.createControlTowerRole(client, partition, roleName);
+    }
+  }
+
   private static logger = createLogger([path.parse(path.basename(__filename)).name]);
 
   /**
@@ -194,40 +229,5 @@ export abstract class IamRole {
     }
 
     IamRole.logger.info(`AWS Control Tower Landing Zone role ${roleName} created successfully.`);
-  }
-
-  /**
-   * Function to create AWS Control Tower Landing Zone roles
-   * @param partition string
-   * @param region string
-   * @param solutionId string
-   * @param managementAccountCredentials {@link IAssumeRoleCredential} | undefined
-   */
-  public static async createControlTowerRoles(
-    partition: string,
-    region: string,
-    solutionId: string,
-    managementAccountCredentials?: IAssumeRoleCredential,
-  ): Promise<void> {
-    const client: IAMClient = new IAMClient({
-      region: region,
-      customUserAgent: solutionId,
-      retryStrategy: setRetryStrategy(),
-      credentials: managementAccountCredentials,
-    });
-
-    const existingRoles = await IamRole.controlTowerRolesExists(client);
-
-    if (existingRoles.status && existingRoles.message.length > 0) {
-      throw new Error(
-        `There are existing AWS Control Tower Landing Zone roles "${existingRoles.message.join(
-          ',',
-        )}", the solution cannot deploy AWS Control Tower Landing Zone`,
-      );
-    }
-
-    for (const roleName of IamRole.requiredControlTowerRoleNames) {
-      await IamRole.createControlTowerRole(client, partition, roleName);
-    }
   }
 }

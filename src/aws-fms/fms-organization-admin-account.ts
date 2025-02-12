@@ -15,7 +15,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { NagSuppressions } from 'cdk-nag';
 
-const path = require('path');
+import * as path from 'path'
 
 /**
  * Initialized FMSOrganizationalAdminAccountProps properties

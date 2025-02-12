@@ -86,6 +86,14 @@ export async function getLandingZoneIdentifier(client: ControlTowerClient): Prom
   return undefined;
 }
 
+export function toPascalCase(str: string) {
+  return str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    .map(x => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase())
+    .join('');
+}
+
+
 /**
  * Function to get the landing zone details
  * @param client {@link ControlTowerClient}

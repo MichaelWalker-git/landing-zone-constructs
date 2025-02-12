@@ -15,7 +15,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Tag } from '@aws-sdk/client-config-service';
 
-const path = require('path');
+import * as path from 'path'
 
 export interface ConfigServiceTagsProps {
   readonly partition: string;

@@ -11,10 +11,10 @@
  *  and limitations under the License.
  */
 
-import { throttlingBackOff } from ;
-import { getGlobalRegion } from '@aws-accelerator/utils/lib/common-functions';
-import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/common-types';
 import * as AWS from 'aws-sdk';
+import { getGlobalRegion } from '../../utils/common-functions';
+import { CloudFormationCustomResourceEvent } from '../../utils/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
 AWS.config.logger = console;
 
 /**
@@ -41,16 +41,17 @@ type validateScpItem = {
 const errors: string[] = [];
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      Status: string;
-    }
+    Status: string;
+  }
   | undefined
 > {
-  const partition = event.ResourceProperties['partition'];
-  const organizationUnits: orgItem[] = event.ResourceProperties['organizationUnits'];
-  const accounts: accountItem[] = event.ResourceProperties['accounts'];
-  const scps: validateScpItem[] = event.ResourceProperties['scps'];
+  const partition = event.ResourceProperties.partition;
+  const organizationUnits: orgItem[] = event.ResourceProperties.organizationUnits;
+  const accounts: accountItem[] = event.ResourceProperties.accounts;
+  const scps: validateScpItem[] = event.ResourceProperties.scps;
   const globalRegion = getGlobalRegion(partition);
-  const organizationsClient = new AWS.Organizations({ customUserAgent: solutionId, region: globalRegion });
+  // TODO(): This solutionId was always missing.
+  const organizationsClient = new AWS.Organizations({ customUserAgent: 'solutionId', region: globalRegion });
 
   switch (event.RequestType) {
     case 'Create':

@@ -166,7 +166,6 @@ export class CreateControlTowerAccounts extends Construct {
       //   includeExecutionData: true,
       //   level: cdk.aws_stepfunctions.LogLevel.ERROR, // error is the default level that CDK auto-creates
       // },
-
     });
 
     //

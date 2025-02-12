@@ -12,15 +12,15 @@
  */
 
 import * as fs from 'fs';
-import * as yaml from 'js-yaml';
 import * as path from 'path';
+import * as yaml from 'js-yaml';
 
-import { createLogger } from '@aws-accelerator/utils/lib/logger';
 
 import { AccountsConfig } from './accounts-config';
 import * as t from './common';
 import * as i from './models/iam-config';
 import { ReplacementsConfig } from './replacements-config';
+import { createLogger } from './utils/logger';
 
 const logger = createLogger(['iam-config']);
 
@@ -36,8 +36,7 @@ export class ManagedActiveDirectorySecretConfig implements i.IManagedActiveDirec
 }
 
 export class ActiveDirectoryConfigurationInstanceUserDataConfig
-  implements i.IActiveDirectoryConfigurationInstanceUserDataConfig
-{
+implements i.IActiveDirectoryConfigurationInstanceUserDataConfig {
   readonly scriptName = '';
   readonly scriptFilePath = '';
 }
@@ -219,22 +218,6 @@ export class IamConfig implements i.IIamConfig {
    */
   static readonly FILENAME = 'iam-config.yaml';
 
-  readonly providers: SamlProviderConfig[] = [];
-  readonly policySets: PolicySetConfig[] = [];
-  readonly roleSets: RoleSetConfig[] = [];
-  readonly groupSets: GroupSetConfig[] = [];
-  readonly userSets: UserSetConfig[] = [];
-  readonly identityCenter: IdentityCenterConfig | undefined = undefined;
-  readonly managedActiveDirectories: ManagedActiveDirectoryConfig[] | undefined = undefined;
-
-  /**
-   *
-   * @param values
-   */
-  constructor(values?: i.IIamConfig) {
-    Object.assign(this, values);
-  }
-
   /**
    * Load from config file content
    * @param dir
@@ -262,6 +245,22 @@ export class IamConfig implements i.IIamConfig {
       logger.error(`${e}`);
       throw new Error('Could not load iam configuration');
     }
+  }
+
+  readonly providers: SamlProviderConfig[] = [];
+  readonly policySets: PolicySetConfig[] = [];
+  readonly roleSets: RoleSetConfig[] = [];
+  readonly groupSets: GroupSetConfig[] = [];
+  readonly userSets: UserSetConfig[] = [];
+  readonly identityCenter: IdentityCenterConfig | undefined = undefined;
+  readonly managedActiveDirectories: ManagedActiveDirectoryConfig[] | undefined = undefined;
+
+  /**
+   *
+   * @param values
+   */
+  constructor(values?: i.IIamConfig) {
+    Object.assign(this, values);
   }
 
   public getManageActiveDirectoryAdminSecretName(directoryName: string): string {
@@ -325,7 +324,7 @@ export class IamConfig implements i.IIamConfig {
   public getManageActiveDirectorySharedAccountNames(directoryName: string, configDir: string): string[] {
     const activeDirectories = this.managedActiveDirectories ?? [];
     const managedActiveDirectory = activeDirectories.find(
-      managedActiveDirectory => managedActiveDirectory.name === directoryName,
+      mgmtActiveDirectory => mgmtActiveDirectory.name === directoryName,
     );
     if (!managedActiveDirectory) {
       logger.error(`getManageActiveDirectoryAdminSecretName Directory ${directoryName} not found in iam-config file`);
@@ -341,7 +340,7 @@ export class IamConfig implements i.IIamConfig {
     const excludedAccounts = managedActiveDirectory.sharedOrganizationalUnits?.excludedAccounts ?? [];
     const accounts = [...sharedAccounts, ...sharedOuAccounts];
     const filteredAccounts = accounts.filter(account => !excludedAccounts.includes(account));
-    return [...new Set(filteredAccounts)];
+    return Array.from(new Set(filteredAccounts));
   }
 
   private getAccountsByOU(ouName: string, accountsConfig: AccountsConfig) {

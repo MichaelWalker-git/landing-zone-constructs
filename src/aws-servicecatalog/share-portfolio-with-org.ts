@@ -14,7 +14,8 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-const path = require('path');
+import * as path from 'path';
+
 
 /**
  * This construct enables the sharing of a Service Catalog Portfolio with an organizational unit.

@@ -15,8 +15,8 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { NagSuppressions } from 'cdk-nag';
 import { v4 as uuidv4 } from 'uuid';
-import { pascalCase } from 'change-case';
 import { LzaLambda } from './lza-lambda';
+import { toPascalCase } from './common/functions';
 
 /**
  * Initialized LzaCustomResourceProps properties
@@ -61,7 +61,7 @@ export interface LzaCustomResourceProps {
     readonly onEventHandler?: cdk.aws_lambda.IFunction;
     /**
      * Debug flag used in custom resource lambda function to output debug logs
-    @default false    
+    @default false
      */
     readonly debug?: boolean;
   };
@@ -266,7 +266,7 @@ export class LzaCustomResource extends Construct {
       onEventHandler: providerLambdaFunction!,
     });
 
-    this.resource = new cdk.CustomResource(this, pascalCase(props.resource.name + 'Resource'), {
+    this.resource = new cdk.CustomResource(this, toPascalCase(props.resource.name + 'Resource'), {
       serviceToken: this.provider.serviceToken,
       properties: this.prepareResourceProperties(props),
     });

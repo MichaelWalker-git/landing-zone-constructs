@@ -11,12 +11,13 @@
  *  and limitations under the License.
  */
 
-import { PortfolioConfig } from '@aws-accelerator/config';
-import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { v4 as uuidv4 } from 'uuid';
 
-const path = require('path');
+import { PortfolioConfig } from '../customizations-config';
+
 
 /**
  * This construct enables the propagation of Service Catalog Portfolio
@@ -69,7 +70,7 @@ export class PropagatePortfolioAssociations extends Construct {
 
     const customResourceObjects = [];
     customResourceObjects.push(
-      new cdk.CustomResource(this, `PropagateAssociations`, {
+      new cdk.CustomResource(this, 'PropagateAssociations', {
         resourceType: RESOURCE_TYPE,
         serviceToken: provider.serviceToken,
         properties: {

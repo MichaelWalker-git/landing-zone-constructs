@@ -12,9 +12,8 @@
  */
 
 import * as AWS from 'aws-sdk';
-
-import { throttlingBackOff } from ;
-import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/common-types';
+import { CloudFormationCustomResourceEvent } from '../../utils/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
 
 /**
  * direct-connect-gateway - lambda handler
@@ -24,15 +23,15 @@ import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/co
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      PhysicalResourceId: string;
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Status: string;
+  }
   | undefined
 > {
   // Set variables
-  const directConnectGatewayName: string = event.ResourceProperties['gatewayName'];
-  const amazonSideAsn: number = event.ResourceProperties['asn'];
-  const solutionId = process.env['SOLUTION_ID'];
+  const directConnectGatewayName: string = event.ResourceProperties.gatewayName;
+  const amazonSideAsn: number = event.ResourceProperties.asn;
+  const solutionId = process.env.SOLUTION_ID;
 
   const dx = new AWS.DirectConnect({ customUserAgent: solutionId });
 
@@ -44,7 +43,7 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
       );
 
       if (!response.directConnectGateway?.directConnectGatewayId) {
-        throw new Error(`Error creating Direct Connect Gateway; unable to retrieve ID value.`);
+        throw new Error('Error creating Direct Connect Gateway; unable to retrieve ID value.');
       }
 
       return {
@@ -53,15 +52,15 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
       };
 
     case 'Update':
-      if (event.OldResourceProperties['asn'] !== amazonSideAsn) {
+      if (event.OldResourceProperties.asn !== amazonSideAsn) {
         console.warn(
-          `Cannot update Amazon side ASN for Direct Connect Gateways. Please delete and recreate the gateway instead.`,
+          'Cannot update Amazon side ASN for Direct Connect Gateways. Please delete and recreate the gateway instead.',
         );
       }
 
-      if (event.OldResourceProperties['gatewayName'] !== directConnectGatewayName) {
+      if (event.OldResourceProperties.gatewayName !== directConnectGatewayName) {
         console.log(
-          `Updating Direct Connect Gateway ${event.PhysicalResourceId} name from ${event.OldResourceProperties['gatewayName']} to ${directConnectGatewayName}`,
+          `Updating Direct Connect Gateway ${event.PhysicalResourceId} name from ${event.OldResourceProperties.gatewayName} to ${directConnectGatewayName}`,
         );
         await throttlingBackOff(() =>
           dx

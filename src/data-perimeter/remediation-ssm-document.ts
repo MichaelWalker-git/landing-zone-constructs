@@ -11,14 +11,16 @@
  *  and limitations under the License.
  */
 
-import * as cdk from 'aws-cdk-lib';
 import * as fs from 'fs';
-import { pascalCase } from 'pascal-case';
-import { Construct } from 'constructs';
 import * as path from 'path';
+import * as cdk from 'aws-cdk-lib';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Construct } from 'constructs';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as yaml from 'js-yaml';
 
 import { Document } from '../aws-ssm/document';
+import { toPascalCase } from '../common/functions';
 import { GlobalConfig } from '../global-config';
 
 /**
@@ -45,7 +47,7 @@ export class RemediationSsmDocument extends Construct {
     const content = yaml.load(buffer);
 
     // Create the document
-    new Document(this, pascalCase(props.documentName), {
+    new Document(this, toPascalCase(props.documentName), {
       name: props.documentName,
       content,
       documentType: 'Automation',

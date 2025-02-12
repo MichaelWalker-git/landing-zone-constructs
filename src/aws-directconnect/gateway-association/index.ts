@@ -12,9 +12,8 @@
  */
 
 import * as AWS from 'aws-sdk';
-
-import { throttlingBackOff } from ;
-import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
+import { CloudFormationCustomResourceEvent } from '../../utils/common-types';
 
 /**
  * direct-connect-gateway-association - lambda handler
@@ -24,25 +23,25 @@ import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/co
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      PhysicalResourceId: string;
-      Data: {
-        TransitGatewayAttachmentId: string;
-      };
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Data: {
+      TransitGatewayAttachmentId: string;
+    };
+    Status: string;
+  }
   | {
-      PhysicalResourceId: string;
-      Status: string;
-    }
+    PhysicalResourceId: string;
+    Status: string;
+  }
   | undefined
 > {
   // Set variables
-  const allowedPrefixesInitial: string[] = event.ResourceProperties['allowedPrefixes'];
-  const directConnectGatewayId: string = event.ResourceProperties['directConnectGatewayId'];
-  const solutionId = process.env['SOLUTION_ID'];
+  const allowedPrefixesInitial: string[] = event.ResourceProperties.allowedPrefixes;
+  const directConnectGatewayId: string = event.ResourceProperties.directConnectGatewayId;
+  const solutionId = process.env.SOLUTION_ID;
   const dx = new AWS.DirectConnect({ customUserAgent: solutionId });
   const ec2 = new AWS.EC2({ customUserAgent: solutionId });
-  const gatewayId: string = event.ResourceProperties['gatewayId'];
+  const gatewayId: string = event.ResourceProperties.gatewayId;
   const lambdaClient = new AWS.Lambda({ customUserAgent: solutionId });
   let attachmentId: string | undefined = undefined;
 
@@ -90,7 +89,7 @@ export async function handler(event: CloudFormationCustomResourceEvent): Promise
     case 'Update':
       // Update association
       if (!(await inProgress(dx, event.PhysicalResourceId))) {
-        const allowedPrefixesPrevious: string[] = event.OldResourceProperties['allowedPrefixes'];
+        const allowedPrefixesPrevious: string[] = event.OldResourceProperties.allowedPrefixes;
         const [addPrefixes, removePrefixes] = getPrefixUpdates(allowedPrefixesInitial, allowedPrefixesPrevious);
 
         await throttlingBackOff(() =>
@@ -259,15 +258,15 @@ function getPrefixUpdates(
  */
 async function retryLambda(lambdaClient: AWS.Lambda, event: CloudFormationCustomResourceEvent): Promise<void> {
   // Add retry attempt to event
-  if (!event.ResourceProperties['retryAttempt']) {
-    event.ResourceProperties['retryAttempt'] = 0;
+  if (!event.ResourceProperties.retryAttempt) {
+    event.ResourceProperties.retryAttempt = 0;
   }
-  event.ResourceProperties['retryAttempt'] += 1;
+  event.ResourceProperties.retryAttempt += 1;
 
   // Throw error for max number of retries
-  if (event.ResourceProperties['retryAttempt'] > 3) {
+  if (event.ResourceProperties.retryAttempt > 3) {
     throw new Error(
-      `Exceeded maximum number of retries. Please check the Direct Connect console for the status of your gateway association.`,
+      'Exceeded maximum number of retries. Please check the Direct Connect console for the status of your gateway association.',
     );
   }
 

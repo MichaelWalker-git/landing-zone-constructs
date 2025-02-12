@@ -11,12 +11,12 @@
  *  and limitations under the License.
  */
 
-import { LaunchTemplateConfig, NetworkInterfaceItemConfig } from '@aws-accelerator/config';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { LaunchTemplate } from './create-launch-template';
+import { LaunchTemplateConfig, NetworkInterfaceItemConfig } from '../customizations-config';
 
 export interface IFirewall extends cdk.IResource {
   /**

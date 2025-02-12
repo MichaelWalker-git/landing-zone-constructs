@@ -11,9 +11,9 @@
  *  and limitations under the License.
  */
 
-import { throttlingBackOff } from ;
-import { CloudFormationCustomResourceEvent } from '@aws-accelerator/utils/lib/common-types';
 import * as AWS from 'aws-sdk';
+import { CloudFormationCustomResourceEvent } from '../../utils/common-types';
+import { throttlingBackOff } from '../../utils/throttle';
 AWS.config.logger = console;
 
 /**
@@ -24,14 +24,14 @@ AWS.config.logger = console;
  */
 export async function handler(event: CloudFormationCustomResourceEvent): Promise<
   | {
-      Status: string | undefined;
-      StatusCode: number | undefined;
-    }
+    Status: string | undefined;
+    StatusCode: number | undefined;
+  }
   | undefined
 > {
-  const directoryId = event.ResourceProperties['directoryId'];
-  const logGroupName = event.ResourceProperties['logGroupName'];
-  const solutionId = process.env['SOLUTION_ID'];
+  const directoryId = event.ResourceProperties.directoryId;
+  const logGroupName = event.ResourceProperties.logGroupName;
+  const solutionId = process.env.SOLUTION_ID;
 
   const directoryServiceClient = new AWS.DirectoryService({ customUserAgent: solutionId });
 

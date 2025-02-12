@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { TransitGatewayAttachmentOptionsConfig } from '@aws-accelerator/config';
 import { LzaCustomResource } from '../lza-custom-resource';
 
-const path = require('path');
+import * as path from 'path'
 
 export interface ITransitGatewayRouteTableAssociation extends cdk.IResource {
   readonly transitGatewayAttachmentId: string;
